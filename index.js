@@ -1,91 +1,79 @@
 // MENU CODE
-const menuBtn = document.querySelector(".menu-icon");
-const cancelBtn = document.querySelector(".cancel-icon");
-const subMenu = document.querySelector(".submenuu");
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleDisplay = (element, displayStyle) => {
+    element.style.display = displayStyle;
+  };
 
-let navbar = document.getElementById("navbar");
-let mobileNav = document.getElementById("mobileNav");
-let serviceLi = document.getElementById("service");
+  document.querySelector(".menu-icon").onclick = () => {
+    toggleDisplay(document.getElementById("navbar"), "none");
+    toggleDisplay(document.getElementById("mobileNav"), "flex");
+  };
 
-const downarrow = document.querySelector(".downarrow");
+  document.querySelector(".cancel-icon").onclick = () => {
+    toggleDisplay(document.getElementById("navbar"), "flex");
+    toggleDisplay(document.getElementById("mobileNav"), "none");
+  };
 
-menuBtn.onclick = () => {
-  navbar.style.display = "none";
-  mobileNav.style.display = "flex";
-};
-
-cancelBtn.onclick = () => {
-  navbar.style.display = "flex";
-  mobileNav.style.display = "none";
-};
-
-serviceLi.onclick = () => {
-  subMenu.style.display = "flex";
-  downarrow.classList.add("rotatearrow");
-};
+  document.getElementById("service").onclick = () => {
+    toggleDisplay(document.querySelector(".submenuu"), "flex");
+    document.querySelector(".downarrow").classList.add("rotatearrow");
+  };
+});
 
 // FORM VALIDATION CODE
 function validateForm() {
-  const username = document.getElementById("username");
-  const email = document.getElementById("email");
-  const password1 = document.getElementById("password1");
-  const password2 = document.getElementById("password2");
-
-  const usernameError = document.getElementById("username-error");
-  const emailError = document.getElementById("email-error");
-  const password1Error = document.getElementById("password1-error");
-  const password2Error = document.getElementById("password2-error");
+  const formFields = [
+    {
+      id: "username",
+      errorId: "username-error",
+      minLen: 5,
+      errorMessage: "Username must be at least 5 characters long.",
+    },
+    {
+      id: "email",
+      errorId: "email-error",
+      pattern: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+      errorMessage: "Please enter a valid email address.",
+    },
+    {
+      id: "password1",
+      errorId: "password1-error",
+      minLen: 8,
+      errorMessage: "Password must be at least 8 characters long.",
+    },
+    {
+      id: "password2",
+      errorId: "password2-error",
+      matchId: "password1",
+      errorMessage: "Passwords must match.",
+    },
+  ];
 
   let valid = true;
 
-  // Validate Username
-  if (username.value === "" || username.value.length < 5) {
-    username.classList.add("error");
-    username.classList.remove("success");
-    usernameError.textContent = "Username must be at least 5 characters long.";
-    valid = false;
-  } else {
-    username.classList.add("success");
-    username.classList.remove("error");
-    usernameError.textContent = "";
-  }
+  formFields.forEach(
+    ({ id, errorId, minLen, pattern, matchId, errorMessage }) => {
+      const field = document.getElementById(id);
+      const errorField = document.getElementById(errorId);
+      let isValid = true;
 
-  // Validate Email
-  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  if (email.value === "" || !emailPattern.test(email.value)) {
-    email.classList.add("error");
-    email.classList.remove("success");
-    emailError.textContent = "Please enter a valid email address.";
-    valid = false;
-  } else {
-    email.classList.add("success");
-    email.classList.remove("error");
-    emailError.textContent = "";
-  }
+      if (
+        field.value === "" ||
+        (minLen && field.value.length < minLen) ||
+        (pattern && !pattern.test(field.value)) ||
+        (matchId && field.value !== document.getElementById(matchId).value)
+      ) {
+        isValid = false;
+        valid = false;
+      }
 
-  // Validate Password1
-  if (password1.value === "" || password1.value.length < 8) {
-    password1.classList.add("error");
-    password1.classList.remove("success");
-    password1Error.textContent = "Password must be at least 8 characters long.";
-    valid = false;
-  } else {
-    password1.classList.add("success");
-    password1.classList.remove("error");
-    password1Error.textContent = "";
-  }
-
-  // Validate Password2
-  if (password2.value === "" || password2.value !== password1.value) {
-    password2.classList.add("error");
-    password2.classList.remove("success");
-    password2Error.textContent = "Passwords must match.";
-    valid = false;
-  } else {
-    password2.classList.add("success");
-    password2.classList.remove("error");
-    password2Error.textContent = "";
-  }
+      field.classList.toggle("error", !isValid);
+      field.classList.toggle("success", isValid);
+      errorField.textContent = isValid ? "" : errorMessage;
+      field.style.borderColor = isValid ? "green" : "red";
+      field.style.borderWidth = "2px";
+    }
+  );
 
   return valid;
 }
